@@ -1,4 +1,10 @@
-import { Component, Input, Output, HostListener } from '@angular/core';
+import {
+	Component,
+	Input,
+	Output,
+	HostListener,
+	ChangeDetectionStrategy,
+} from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import {
 	trigger,
@@ -22,6 +28,7 @@ import {
 	host: {
 		class: 'card',
 	},
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent {
 	@HostListener('click', ['card'])

@@ -1,10 +1,10 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CardsService, Card } from '../cards.service';
 
 const HIDE_TIME = 5000;
-const TOOGLE_TIME = 350;
+const TOOGLE_TIME = 400;
 const MARTCHING_CARDS_QTY = 2;
 
 @Component({
@@ -13,7 +13,7 @@ const MARTCHING_CARDS_QTY = 2;
 })
 export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 	private destroy$ = new Subject<void>();
-	cards: Card[];
+	cards$: Observable<Card[]>;
 	currentCard$ = new Subject();
 	persistentVisibleCards = [];
 	selectedCards = [];
@@ -22,10 +22,10 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 	constructor(private cardsService: CardsService) {}
 
 	ngOnInit() {
-		this.cards = this.cardsService.getCards();
+		this.cards$ = this.cardsService.getCards();
 
 		setTimeout(() => {
-			this.cards.forEach((card) => (card.visible = false));
+			this.cardsService.hideAllCards();
 			this.isReady = true;
 		}, HIDE_TIME);
 	}
@@ -34,7 +34,7 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.currentCard$
 			.pipe(takeUntil(this.destroy$))
 			.subscribe((card: Card) => {
-				card.visible = true;
+				this.cardsService.toggleCardVisibility([card], true);
 				this.selectedCards.push(card);
 
 				if (this.canMatchingCards()) {
@@ -48,7 +48,7 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.destroy$.complete();
 	}
 
-	canMatchingCards() {
+	canMatchingCards(): boolean {
 		return this.selectedCards.length === MARTCHING_CARDS_QTY;
 	}
 
@@ -66,27 +66,26 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 		}
 	}
 
-	cardsIsEqual(card1Nmuber, card2Nmuber) {
+	cardsIsEqual(card1Nmuber, card2Nmuber): boolean {
 		return card1Nmuber === card2Nmuber;
 	}
 
 	toggleCards(card1, card2, isVisible) {
 		setTimeout(() => {
-			card1.visible = isVisible;
-			card2.visible = isVisible;
+			this.cardsService.toggleCardVisibility([card1, card2], isVisible);
 		}, TOOGLE_TIME);
 	}
 
 	addToPersistentVisibleCards(cards) {
-		cards.forEach((card) => this.persistentVisibleCards.push(card));
+		cards.forEach((card) => this.persistentVisibleCards.push(card.id));
 	}
 
 	trackByIndex(index): number {
 		return index;
 	}
 
-	getCardIsPersistentVisible(card) {
-		return this.persistentVisibleCards.indexOf(card) !== -1;
+	getCardIsPersistentVisible(id): boolean {
+		return this.persistentVisibleCards.indexOf(id) !== -1;
 	}
 
 	onCardClick(card) {
