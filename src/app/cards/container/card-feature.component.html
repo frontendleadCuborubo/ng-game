@@ -1,0 +1,12 @@
+<h1 class="text-center">Mahjong like game</h1>
+<div class="container">
+	<div class="grid-row">
+		<ng-container *ngFor="let card of cards; trackBy: trackByIndex">
+			<app-card
+				[card]="card"
+				[class.visible]="getCardIsPersistentVisible(card)"
+				(cardClick)="onCardClick(card)"
+			></app-card>
+		</ng-container>
+	</div>
+</div>
