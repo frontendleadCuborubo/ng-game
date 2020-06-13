@@ -5,8 +5,8 @@
 			*ngFor="let card of cards$ | async; trackBy: trackByIndex"
 		>
 			<app-card
+				id="{{ 'card-' + card.id }}"
 				[card]="card"
-				[class.visible]="getCardIsPersistentVisible(card.id)"
 				(cardClick)="onCardClick(card)"
 			></app-card>
 		</ng-container>

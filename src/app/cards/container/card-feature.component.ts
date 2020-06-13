@@ -1,4 +1,11 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+	Component,
+	OnInit,
+	AfterViewInit,
+	OnDestroy,
+	ElementRef,
+	Renderer,
+} from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -15,11 +22,14 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 	readonly matchihngCardsQty: number = 2;
 	cards$: Observable<Card[]>;
 	currentCard$ = new Subject();
-	persistentVisibleCards = [];
 	selectedCards = [];
 	isReady = false;
 
-	constructor(private cardsService: CardsService) {}
+	constructor(
+		private renderer: Renderer,
+		private element: ElementRef,
+		private cardsService: CardsService
+	) {}
 
 	ngOnInit() {
 		this.cards$ = this.cardsService.getCards();
@@ -53,39 +63,39 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	doMatchingCards() {
-		let card1 = this.selectedCards[0];
-		let card2 = this.selectedCards[1];
+		const [card1, card2] = this.selectedCards;
 
 		this.selectedCards = [];
 
 		if (this.cardsIsEqual(card1.primeNumber, card2.primeNumber)) {
-			this.addToPersistentVisibleCards([card1, card2]);
-			this.toggleCards(card1, card2, true);
+			this.addVisibilityClass([card1, card2]);
 		} else {
 			this.toggleCards(card1, card2, false);
 		}
 	}
 
-	cardsIsEqual(card1Nmuber, card2Nmuber): boolean {
+	cardsIsEqual(card1Nmuber: number, card2Nmuber: number): boolean {
 		return card1Nmuber === card2Nmuber;
 	}
 
-	toggleCards(card1, card2, isVisible) {
+	toggleCards(card1: Card, card2: Card, isVisible: boolean) {
 		setTimeout(() => {
 			this.cardsService.toggleCardVisibility([card1, card2], isVisible);
 		}, this.cardTogggleTime);
 	}
 
-	addToPersistentVisibleCards(cards) {
-		cards.forEach((card) => this.persistentVisibleCards.push(card.id));
+	addVisibilityClass(cards: Card[]) {
+		cards.forEach((card) => {
+			let cardElem = this.element.nativeElement.querySelector(
+				'#card-' + card.id
+			);
+
+			this.renderer.setElementClass(cardElem, 'visible', true);
+		});
 	}
 
 	trackByIndex(index): number {
 		return index;
-	}
-
-	getCardIsPersistentVisible(id): boolean {
-		return this.persistentVisibleCards.indexOf(id) !== -1;
 	}
 
 	onCardClick(card: Card) {
