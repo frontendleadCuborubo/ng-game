@@ -1,13 +1,5 @@
-import {
-	Component,
-	OnInit,
-	AfterViewInit,
-	OnDestroy,
-	ElementRef,
-	Renderer,
-} from '@angular/core';
-import { Subject, Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Component, OnInit, ElementRef, Renderer } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import { CardsService, Card } from '../cards.service';
 
@@ -15,15 +7,13 @@ import { CardsService, Card } from '../cards.service';
 	selector: 'app-card-feature',
 	templateUrl: './card-feature.component.html',
 })
-export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
-	private destroy$ = new Subject<void>();
+export class CardFeatureComponent implements OnInit {
 	readonly hideCardsTime: number = 5000;
 	readonly cardTogggleTime: number = 400;
 	readonly matchihngCardsQty: number = 2;
 	cards$: Observable<Card[]>;
-	currentCard$ = new Subject();
 	selectedCards = [];
-	isReady = false;
+	isReady: boolean = false;
 
 	constructor(
 		private renderer: Renderer,
@@ -40,22 +30,15 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 		}, this.hideCardsTime);
 	}
 
-	ngAfterViewInit() {
-		this.currentCard$
-			.pipe(takeUntil(this.destroy$))
-			.subscribe((card: Card) => {
-				this.cardsService.toggleCardVisibility([card], true);
-				this.selectedCards.push(card);
+	onCardClick(card: Card) {
+		if (this.isReady) {
+			this.cardsService.toggleCardVisibility([card], true);
+			this.selectedCards.push(card);
 
-				if (this.canMatchingCards()) {
-					this.doMatchingCards();
-				}
-			});
-	}
-
-	ngOnDestroy() {
-		this.destroy$.next();
-		this.destroy$.complete();
+			if (this.canMatchingCards()) {
+				this.doMatchingCards();
+			}
+		}
 	}
 
 	canMatchingCards(): boolean {
@@ -96,11 +79,5 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	trackByIndex(index): number {
 		return index;
-	}
-
-	onCardClick(card: Card) {
-		if (this.isReady) {
-			this.currentCard$.next(card);
-		}
 	}
 }
