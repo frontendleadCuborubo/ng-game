@@ -9,14 +9,6 @@ export interface Card {
 	visible: boolean;
 }
 
-const cardFactory = (idx: number, primeNumbers: []): Card => {
-	return {
-		id: idx,
-		primeNumber: primeNumbers[idx],
-		visible: true,
-	};
-};
-
 @Injectable({
 	providedIn: 'root',
 })
@@ -78,8 +70,16 @@ export class CardsService {
 	}
 
 	private getCardsFromPrimeNumbers(): Card[] {
-		return Array.from({ length: this.visibleCardsQty }, (x, i) =>
-			cardFactory(i, this.shuffledPrimeNumbers)
+		return Array.from({ length: this.visibleCardsQty }, (x, idx) =>
+			this.cardFactory(idx, this.shuffledPrimeNumbers)
 		);
+	}
+
+	private cardFactory(idx: number, primeNumbers: []): Card {
+		return {
+			id: idx,
+			primeNumber: primeNumbers[idx],
+			visible: true,
+		};
 	}
 }

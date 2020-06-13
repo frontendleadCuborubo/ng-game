@@ -13,6 +13,7 @@ import {
 	transition,
 	animate,
 } from '@angular/animations';
+import { Card } from '../cards.service';
 
 @Component({
 	selector: 'app-card',
@@ -32,17 +33,17 @@ import {
 })
 export class CardComponent {
 	@HostListener('click', ['card'])
-	handleClick(card) {
+	handleClick(card: Card) {
 		if (!card.visible) {
 			this.cardClick.emit(card);
 		}
 	}
 
-	get isVisible() {
+	get isVisible(): boolean {
 		return this.card.visible;
 	}
 
-	@Input() card;
+	@Input() card: Card;
 
 	@Output() cardClick = new EventEmitter<any>();
 }

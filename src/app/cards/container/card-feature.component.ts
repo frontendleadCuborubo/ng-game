@@ -1,11 +1,8 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { CardsService, Card } from '../cards.service';
 
-const HIDE_TIME = 5000;
-const TOOGLE_TIME = 400;
-const MARTCHING_CARDS_QTY = 2;
+import { CardsService, Card } from '../cards.service';
 
 @Component({
 	selector: 'app-card-feature',
@@ -13,6 +10,9 @@ const MARTCHING_CARDS_QTY = 2;
 })
 export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 	private destroy$ = new Subject<void>();
+	readonly hideCardsTime: number = 5000;
+	readonly cardTogggleTime: number = 400;
+	readonly matchihngCardsQty: number = 2;
 	cards$: Observable<Card[]>;
 	currentCard$ = new Subject();
 	persistentVisibleCards = [];
@@ -27,7 +27,7 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 		setTimeout(() => {
 			this.cardsService.hideAllCards();
 			this.isReady = true;
-		}, HIDE_TIME);
+		}, this.hideCardsTime);
 	}
 
 	ngAfterViewInit() {
@@ -49,7 +49,7 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	canMatchingCards(): boolean {
-		return this.selectedCards.length === MARTCHING_CARDS_QTY;
+		return this.selectedCards.length === this.matchihngCardsQty;
 	}
 
 	doMatchingCards() {
@@ -73,7 +73,7 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 	toggleCards(card1, card2, isVisible) {
 		setTimeout(() => {
 			this.cardsService.toggleCardVisibility([card1, card2], isVisible);
-		}, TOOGLE_TIME);
+		}, this.cardTogggleTime);
 	}
 
 	addToPersistentVisibleCards(cards) {
@@ -88,7 +88,7 @@ export class CardFeatureComponent implements OnInit, AfterViewInit, OnDestroy {
 		return this.persistentVisibleCards.indexOf(id) !== -1;
 	}
 
-	onCardClick(card) {
+	onCardClick(card: Card) {
 		if (this.isReady) {
 			this.currentCard$.next(card);
 		}
