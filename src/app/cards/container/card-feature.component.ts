@@ -53,7 +53,7 @@ export class CardFeatureComponent implements OnInit {
 		if (this.cardsIsEqual(card1.primeNumber, card2.primeNumber)) {
 			this.addVisibilityClass([card1, card2]);
 		} else {
-			this.toggleCards(card1, card2, false);
+			this.toggleCards([card1, card2], false);
 		}
 	}
 
@@ -61,9 +61,9 @@ export class CardFeatureComponent implements OnInit {
 		return card1Nmuber === card2Nmuber;
 	}
 
-	toggleCards(card1: Card, card2: Card, isVisible: boolean) {
+	toggleCards(cards: Card[], isVisible: boolean) {
 		setTimeout(() => {
-			this.cardsService.toggleCardVisibility([card1, card2], isVisible);
+			this.cardsService.toggleCardVisibility(cards, isVisible);
 		}, this.cardTogggleTime);
 	}
 
