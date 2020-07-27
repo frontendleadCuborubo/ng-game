@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
 	title = 'github-a-1mahjong-game';
+	title2 = 'local-a-1mahjong-game';
 }
